@@ -301,7 +301,7 @@ inline trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
 
 inline bool check_state_tolerance_per_joint(
   const trajectory_msgs::msg::JointTrajectoryPoint & state_error, size_t joint_idx,
-  const StateTolerances & state_tolerance, bool show_errors = false)
+  const StateTolerances & state_tolerance, bool show_errors)
 {
   using std::abs;
 
@@ -367,7 +367,7 @@ inline bool check_state_tolerance_per_joint(
 inline bool check_trajectory_point_tolerance(
   const trajectory_msgs::msg::JointTrajectoryPoint & state_error,
   const std::vector<StateTolerances> & segment_tolerances,
-  bool show_errors = false)
+  bool show_errors)
 {
   // Check that the error vector size matches the tolerance vector size
   if (state_error.positions.size() != segment_tolerances.size())
