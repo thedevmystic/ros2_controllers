@@ -40,72 +40,33 @@
 
 namespace joint_trajectory_controller
 {
-
 /**
- * \brief Trajectory state tolerances for joint state components.
+ * \brief Trajectory state tolerances for position, velocity, acceleration, and effort variables.
  *
- * A tolerance value of zero means that no tolerance will be applied for that component.
+ * A tolerance value of zero means that no tolerance will be applied for that variable.
  */
 struct StateTolerances
 {
-  /**
-   * \brief Position component (Base).
-   */
   double position = 0.0;
-
-  /**
-   * \brief Velocity component (1st Derivative).
-   */
   double velocity = 0.0;
-
-  /**
-   * \brief Acceleration component (2nd Derivative).
-   */
   double acceleration = 0.0;
-
-  /**
-   * \brief Effort component (Torque).
-   */
   double effort = 0.0;
 };
 
 /**
- * \brief Trajectory segment tolerances for validation during execution and at the endpoint.
- *
- * This structure defines the allowable deviation from the planned trajectory
- * during execution (state_tolerance) and the final required accuracy at the
- * segment's endpoint (goal_state_tolerance).
+ * \brief Trajectory segment tolerances.
  */
 struct SegmentTolerances
 {
   explicit SegmentTolerances(size_t size = 0) : state_tolerance(size), goal_state_tolerance(size) {}
 
-  /**
-   * \brief State tolerances applied throughout the segment's execution.
-   *
-   * If the actual joint state deviates from the desired setpoint by more than
-   * this tolerance at any time during the segment, the trajectory execution
-   * may be aborted. This vector contains one entry for each joint.
-   */
+  /** State tolerances that apply during segment execution. */
   std::vector<StateTolerances> state_tolerance;
 
-  /**
-   * \brief State tolerances applied only to the final goal state.
-   *
-   * These are the tolerances the joint state must meet at the segment's
-   * end time (or within the goal_time_tolerance window) for the segment
-   * to be considered successfully completed. This vector contains one entry
-   * for each joint.
-   */
+  /** State tolerances that apply for the goal state only.*/
   std::vector<StateTolerances> goal_state_tolerance;
 
-  /**
-   * \brief Extra time allowed to reach the goal state tolerances.
-   *
-   * This defines a time window (in seconds) after the segment's
-   * planned end time, during which the goal_state_tolerance must be met.
-   * This allows the robot to "settle" into the final target position.
-   */
+  /** Extra time after the segment end time allowed to reach the goal state tolerances. */
   double goal_time_tolerance = 0.0;
 };
 
