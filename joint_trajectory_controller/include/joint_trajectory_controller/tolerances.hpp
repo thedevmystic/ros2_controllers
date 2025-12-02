@@ -63,11 +63,6 @@ struct StateTolerances
    * \brief Acceleration component (2nd Derivative).
    */
   double acceleration = 0.0;
-
-  /**
-   * \brief Effort component (Torque).
-   */
-  double effort = 0.0;
 };
 
 /**
@@ -124,13 +119,11 @@ struct SegmentTolerances
  *     trajectory:
  *       position: 0.05               # Defaults to 0.0 (Enforced during execution)
  *       velocity: 0.1
- *      acceleration: 0.2
- *      effort: 0.3
+ *       acceleration: 0.2
  *     goal:
  *       position: 0.03               # Defaults to 0.0 (Enforced at final goal state)
  *       velocity: 0.01               # Note: 'stopped_velocity_tolerance' overrides this if higher.
  *       acceleration: 0.4
- *       effort: 0.5
  *    bar_joint:
  *      goal:
  *        position: 0.01
@@ -286,16 +279,6 @@ inline trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
       subtract);
   }
 
-  // Effort Error (Only if both are available)
-  if (!desired_state.effort.empty() && !current_state.effort.empty())
-  {
-    error_state.effort.resize(n_joints);
-    std::transform(
-      desired_state.effort.begin(), desired_state.effort.end(),
-      current_state.effort.begin(), error_state.effort.begin(),
-      subtract);
-  }
-
   return error_state;
 }
 
@@ -311,15 +294,12 @@ inline bool check_state_tolerance_per_joint(
     state_error.velocities.empty() ? 0.0 : state_error.velocities[joint_idx];
   const double error_acceleration =
     state_error.accelerations.empty() ? 0.0 : state_error.accelerations[joint_idx];
-  const double error_effort =
-    state_error.effort.empty() ? 0.0 : state_error.effort[joint_idx];
 
   // Check if the components are valid
   const bool is_valid =
     !(state_tolerance.position > 0.0 && abs(error_position) > state_tolerance.position) &&
     !(state_tolerance.velocity > 0.0 && abs(error_velocity) > state_tolerance.velocity) &&
-    !(state_tolerance.acceleration > 0.0 && abs(error_acceleration) > state_tolerance.acceleration) &&
-    !(state_tolerance.effort > 0.0 && abs(error_effort) > state_tolerance.effort);
+    !(state_tolerance.acceleration > 0.0 && abs(error_acceleration) > state_tolerance.acceleration);
 
   // If valid, then return true
   if (is_valid)
@@ -351,12 +331,6 @@ inline bool check_state_tolerance_per_joint(
       RCLCPP_ERROR(
         logger, "Acceleration Error: %f, Acceleration Tolerance: %f", error_acceleration,
         state_tolerance.acceleration);
-    }
-    if (state_tolerance.effort > 0.0 && abs(error_effort) > state_tolerance.effort)
-    {
-      RCLCPP_ERROR(
-        logger, "Effort Error: %f, Effort Tolerance: %f", error_effort,
-        state_tolerance.effort);
     }
   }
 
