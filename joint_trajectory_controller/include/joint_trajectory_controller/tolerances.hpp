@@ -41,7 +41,7 @@
 namespace joint_trajectory_controller
 {
 /**
- * \brief Trajectory state tolerances for position, velocity and acceleration variables.
+ * \brief Trajectory state tolerances for position, velocity, acceleration, and effort variables.
  *
  * A tolerance value of zero means that no tolerance will be applied for that variable.
  */
@@ -50,6 +50,7 @@ struct StateTolerances
   double position = 0.0;
   double velocity = 0.0;
   double acceleration = 0.0;
+  double effort = 0.0;
 };
 
 /**
