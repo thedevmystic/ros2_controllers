@@ -215,7 +215,7 @@ joint_trajectory_controller:
         gt_eq: [0.0],
       }
     }
-    __map_joints:
+    MapJoints:
       trajectory:
         position: {
           type: double,
