@@ -27,6 +27,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/heads') }}
 
+# ... (existing content above, ending the 'build-on-humble' job)
+
 jobs:
   build-on-humble:
     uses: ros-controls/ros2_control_ci/.github/workflows/reusable-industrial-ci-with-cache.yml@master
@@ -35,3 +37,23 @@ jobs:
       ros_repo: testing
       upstream_workspace: ros2_controllers.rolling.repos
       ref_for_scheduled_build: master
+  
+  # --- NEW JOB TO UPLOAD PARAMETERS FILE ---
+  upload-generated-params:
+    name: Upload Parameters HPP
+    runs-on: ubuntu-latest
+    needs: build-on-humble # Wait for the build to complete
+    
+    steps:
+      - name: Download workspace artifact (ros_ws_artifact)
+        uses: actions/download-artifact@v4
+        with:
+          name: ros_ws_artifact # Name used by reusable-industrial-ci for the built workspace
+
+      - name: Locate and upload parameters header file
+        uses: actions/upload-artifact@v4
+        with:
+          # The path where the file is typically generated after 'colcon build'
+          path: ros_ws/install/joint_trajectory_controller/include/joint_trajectory_controller/*parameters.hpp
+          name: joint-trajectory-controller-parameters-file
+          if-no-files-found: warn
