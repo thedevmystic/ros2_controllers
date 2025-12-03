@@ -56,6 +56,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           # The path where the file is typically generated after 'colcon build'
-          path: ros_ws/install/joint_trajectory_controller/include/joint_trajectory_controller/*parameters.hpp
+          path: /home/runner/work/ros2_controllers/ros2_controllers/.work/target_ws/install/
           name: joint-trajectory-controller-parameters-file
           if-no-files-found: warn
