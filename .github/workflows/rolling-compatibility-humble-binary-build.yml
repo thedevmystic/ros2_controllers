@@ -47,11 +47,6 @@ jobs:
     if: always()
     
     steps:
-      - name: Download workspace artifact (ros_ws_artifact)
-        uses: actions/download-artifact@v4
-        with:
-          name: ros_ws_artifact # Name used by reusable-industrial-ci for the built workspace
-
       - name: Locate and upload parameters header file
         uses: actions/upload-artifact@v4
         with:
