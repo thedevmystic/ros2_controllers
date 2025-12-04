@@ -27,34 +27,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/heads') }}
 
-# ... (existing content above, ending the 'build-on-humble' job)
-
 jobs:
-  build-and-upload-on-humble: # Renamed the job to reflect its new purpose
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        
-      - name: Run industrial_ci Build
-        uses: 'ros-industrial/industrial_ci@master'
-        env:
-          ROS_DISTRO: humble
-          ROS_REPO: testing
-          UPSTREAM_WORKSPACE: ros2_controllers.rolling.repos
-
-      - name: Debug - List contents of .work directory
-        if: always()
-        run: ls -R .work
-      
-      - name: Locate and upload parameters header file
-        # The 'if: always()' ensures this step runs even if the previous 'Run industrial_ci Build' step failed.
-        if: always() 
-        uses: actions/upload-artifact@v4
-        with:
-          # This path is relative to $GITHUB_WORKSPACE, where the build created the .work folder
-          # Assuming the package is joint_trajectory_controller
-          path: .work/**/joint_trajectory_controller_parameters.hpp
-          name: joint-trajectory-controller-parameters-file
-          if-no-files-found: warn
+  build-on-humble:
+    uses: ros-controls/ros2_control_ci/.github/workflows/reusable-industrial-ci-with-cache.yml@master
+    with:
+      ros_distro: humble
+      ros_repo: testing
+      upstream_workspace: ros2_controllers.rolling.repos
+      ref_for_scheduled_build: master
