@@ -80,12 +80,8 @@ SegmentTolerances get_segment_tolerances(rclcpp::Logger & jtc_logger, const Para
   for (size_t i = 0; i < n_joints; ++i)
   {
     auto const joint = params.joints[i];
-<<<<<<< HEAD
     auto const & joint_constraints = constraints.joints_map.at(joint);
-=======
-    auto const & joint_constraints = constraints.joints.at(joint);
->>>>>>> 0b802a3a43cee9acbba3874a98521bbfe39e603e
-
+    
     // Path/Trajectory Tolerances (state_tolerance)
     tolerances.state_tolerance[i].position = joint_constraints.trajectory.position;
     tolerances.state_tolerance[i].velocity = joint_constraints.trajectory.velocity;
