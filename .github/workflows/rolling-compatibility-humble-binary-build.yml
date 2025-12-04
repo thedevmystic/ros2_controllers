@@ -51,6 +51,6 @@ jobs:
         with:
           # This path is relative to $GITHUB_WORKSPACE, where the build created the .work folder
           # Assuming the package is joint_trajectory_controller
-          path: .work/target_ws/install/joint_trajectory_controller/include/joint_trajectory_controller/joint_trajectory_controller_parameters.hpp
+          path: .work/**/joint_trajectory_controller_parameters.hpp
           name: joint-trajectory-controller-parameters-file
           if-no-files-found: warn
