@@ -3,10 +3,8 @@ name: Check Rolling Compatibility on Humble
 # description: 'Build & test the rolling version on Humble distro.'
 
 on:
-  # ... (existing content for triggers)
   workflow_dispatch:
   pull_request: &event
-    # ... (existing content for paths)
     branches:
       - master
       - '*feature*'
@@ -29,31 +27,30 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/heads') }}
 
+# ... (existing content above, ending the 'build-on-humble' job)
+
 jobs:
   build-on-humble:
-    runs-on: ubuntu-latest # Must explicitly specify the runner for subsequent steps
+    runs-on: ubuntu-latest
     steps:
-      - name: Run CI and Build
-        uses: ros-controls/ros2_control_ci/.github/workflows/reusable-industrial-ci-with-cache.yml@master
-        with:
-          ros_distro: humble
-          ros_repo: testing
-          upstream_workspace: ros2_controllers.rolling.repos
-          ref_for_scheduled_build: master
-      
-      # --- NEW STEP TO UPLOAD PARAMETERS FILE ---
-      - name: Locate and upload parameters header file
-        # The 'if: always()' ensures this step runs even if the previous 'Run CI and Build' step fails.
-        if: always() 
-        uses: actions/upload-artifact@v4
-        with:
-          # This is the correct, common path where industrial_ci installs files.
-          # The path uses the environment variable $BASEDIR which defaults to .work 
-          # (as seen in the reusable workflow), inside the runner's workspace.
-          # Full path: $GITHUB_WORKSPACE/.work/target_ws/install/joint_trajectory_controller/include/joint_trajectory_controller/joint_trajectory_controller_parameters.hpp
-          path: .work/target_ws/install/joint_trajectory_controller/include/joint_trajectory_controller/joint_trajectory_controller_parameters.hpp
-          name: joint-trajectory-controller-parameters-file
-          # This setting ensures the workflow run won't fail if the file is genuinely missing (e.g., if build failed very early).
-          if-no-files-found: warn 
+    - name: Run CI
+      uses: ros-controls/ros2_control_ci/.github/workflows/reusable-industrial-ci-with-cache.yml@master
+      with:
+        ros_distro: humble
+        ros_repo: testing
+        upstream_workspace: ros2_controllers.rolling.repos
+        ref_for_scheduled_build: master
 
-  # --- REMOVE the 'upload-generated-params' job as it is no longer needed. ---
+    - name: Locate and upload parameters header file
+      # The 'if: always()' ensures this step runs even if the previous 'Run CI and Build' step fails.
+      if: always() 
+      uses: actions/upload-artifact@v4
+      with:
+        # This is the correct, common path where industrial_ci installs files.
+        # The path uses the environment variable $BASEDIR which defaults to .work 
+        # (as seen in the reusable workflow), inside the runner's workspace.
+        # Full path: $GITHUB_WORKSPACE/.work/target_ws/install/joint_trajectory_controller/include/joint_trajectory_controller/joint_trajectory_controller_parameters.hpp
+        path: .work/target_ws/install/joint_trajectory_controller/include/joint_trajectory_controller/joint_trajectory_controller_parameters.hpp
+        name: joint-trajectory-controller-parameters-file
+        # This setting ensures the workflow run won't fail if the file is genuinely missing (e.g., if build failed very early).
+        if-no-files-found: warn
