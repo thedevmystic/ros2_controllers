@@ -215,7 +215,11 @@ joint_trajectory_controller:
         gt_eq: [0.0],
       }
     }
+<<<<<<< HEAD
     joints_map:
+=======
+    MapJoints:
+>>>>>>> 0b802a3a43cee9acbba3874a98521bbfe39e603e
       trajectory:
         position: {
           type: double,
@@ -242,7 +246,11 @@ joint_trajectory_controller:
           type: double,
           default_value: 0.0,
           description: "Velocity tolerance for the final goal state.
+<<<<<<< HEAD
           If 'stopped_velocity_tolerance' is higher, then it will override this."
+=======
+          Note: The global 'stopped_velocity_tolerance' will override this if it is higher."
+>>>>>>> 0b802a3a43cee9acbba3874a98521bbfe39e603e
         }
         acceleration: {
           type: double,
