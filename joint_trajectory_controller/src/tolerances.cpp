@@ -233,3 +233,4 @@ SegmentTolerances get_segment_tolerances(
   return active_tolerances;
 }
 
+} // namespace joint_trajectory_controller
