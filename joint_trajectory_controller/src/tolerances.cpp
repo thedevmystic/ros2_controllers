@@ -115,6 +115,21 @@ SegmentTolerances get_segment_tolerances(
     joint_to_id[joints[i]] = i;
   }
 
+  // Process goal_time_tolerance
+  try
+  {
+    double goal_time_sec = rclcpp::Duration(goal.goal_time_tolerance).seconds();
+    active_tolerances.goal_time_tolerance = resolve_tolerance_source(
+      default_tolerances.goal_time_tolerance, goal_time_sec);
+  }
+  catch (const std::runtime_error & e)
+  {
+    RCLCPP_ERROR(
+      logger, "Illegal goal time tolerance specified: %f. Using default tolerances.",
+      rclcpp::Duration(goal.goal_time_tolerance).seconds());
+    return default_tolerances;
+  }
+
   // Process goal.path_tolerance (Execution Constraints)
   for (const auto & joint_tol : goal.path_tolerance)
   {
@@ -199,21 +214,6 @@ SegmentTolerances get_segment_tolerances(
     }
   }
 
-  // Process goal_time_tolerance
-  try
-  {
-    double goal_time_sec = rclcpp::Duration(goal.goal_time_tolerance).seconds();
-    active_tolerances.goal_time_tolerance = resolve_tolerance_source(
-      default_tolerances.goal_time_tolerance, goal_time_sec);
-  }
-  catch (const std::runtime_error & e)
-  {
-    RCLCPP_ERROR(
-      logger, "Illegal goal time tolerance specified: %f. Using default tolerances.",
-      rclcpp::Duration(goal.goal_time_tolerance).seconds());
-    return default_tolerances;
-  }
-  
   // Debug Logging
   RCLCPP_DEBUG(logger, "---- Active Tolerances ----");
   RCLCPP_DEBUG(logger, "Goal Time: %f", active_tolerances.goal_time_tolerance);
