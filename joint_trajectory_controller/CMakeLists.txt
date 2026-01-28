@@ -38,6 +38,7 @@ add_library(joint_trajectory_controller SHARED
   src/joint_trajectory_controller.cpp
   src/tolerances.cpp
   src/trajectory.cpp
+  src/validate_jtc_parameters.cpp
 )
 target_compile_features(joint_trajectory_controller PUBLIC cxx_std_17)
 if(WIN32)
