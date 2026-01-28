@@ -106,7 +106,8 @@ SegmentTolerances get_segment_tolerances(
   const std::vector<std::string> & joints)
 {
   static auto logger = jtc_logger.get_child("tolerance");
-  
+  SegmentTolerances active_tolerances(default_tolerances);
+
   // Process goal_time_tolerance
   try
   {
@@ -122,7 +123,6 @@ SegmentTolerances get_segment_tolerances(
     return default_tolerances;
   }
 
-  SegmentTolerances active_tolerances(default_tolerances);
   
   // Create a map to look up joint by name for fast access
   std::map<std::string, size_t> joint_to_id;
