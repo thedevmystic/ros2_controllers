@@ -47,7 +47,7 @@ double resolve_tolerance_source(const double default_value, const double goal_va
   // Erase value is -1.0
   const double ERASE_VALUE = -1.0;
   // Epsilon for comparision
-  const double EPSILON = std::numeric_limits<double>::epsilon();
+  const double EPSILON = std::numeric_limits<float>::epsilon();
 
   if (goal_value > 0.0)
   {
@@ -73,7 +73,7 @@ SegmentTolerances get_segment_tolerances(rclcpp::Logger & jtc_logger, const Para
 
   SegmentTolerances tolerances;
   tolerances.goal_time_tolerance = constraints.goal_time;
-  static auto logger = jtc_logger.get_child("param_tolerances_loader");
+  static auto logger = jtc_logger.get_child("tolerance");
   RCLCPP_DEBUG(logger, "Goal Time: %f", constraints.goal_time);
 
   // State and goal tolerances
@@ -200,13 +200,18 @@ SegmentTolerances get_segment_tolerances(
   }
 
   // Process goal_time_tolerance
-  if (goal.goal_time_tolerance.sec != 0 || goal.goal_time_tolerance.nanosec != 0)
+  try
   {
-    const double goal_time_sec =
-      static_cast<double>(goal.goal_time_tolerance.sec) +
-      static_cast<double>(goal.goal_time_tolerance.nanosec) / 1e9;
-
-    active_tolerances.goal_time_tolerance = std::max(0.0, goal_time_sec);
+    double goal_time_sec = rclcpp::Duration(goal.goal_time_tolerance).seconds();
+    active_tolerances.goal_time_tolerance = resolve_tolerance_source(
+      default_tolerances.goal_time_tolerance, goal_time_sec);
+  }
+  catch (const std::runtime_error & e)
+  {
+    RCLCPP_ERROR(
+      logger, "Illegal goal time tolerance specified: %f. Using default tolerances.",
+      rclcpp::Duration(goal.goal_time_tolerance).seconds());
+    return default_tolerances;
   }
   
   // Debug Logging
