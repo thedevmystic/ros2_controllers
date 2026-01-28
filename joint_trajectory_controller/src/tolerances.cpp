@@ -105,16 +105,8 @@ SegmentTolerances get_segment_tolerances(
   const control_msgs::action::FollowJointTrajectory::Goal & goal,
   const std::vector<std::string> & joints)
 {
-  SegmentTolerances active_tolerances(default_tolerances);
   static auto logger = jtc_logger.get_child("tolerance");
   
-  // Create a map to look up joint by name for fast access
-  std::map<std::string, size_t> joint_to_id;
-  for (size_t i = 0; i < joints.size(); ++i)
-  {
-    joint_to_id[joints[i]] = i;
-  }
-
   // Process goal_time_tolerance
   try
   {
@@ -129,6 +121,16 @@ SegmentTolerances get_segment_tolerances(
       rclcpp::Duration(goal.goal_time_tolerance).seconds());
     return default_tolerances;
   }
+
+  SegmentTolerances active_tolerances(default_tolerances);
+  
+  // Create a map to look up joint by name for fast access
+  std::map<std::string, size_t> joint_to_id;
+  for (size_t i = 0; i < joints.size(); ++i)
+  {
+    joint_to_id[joints[i]] = i;
+  }
+
 
   // Process goal.path_tolerance (Execution Constraints)
   for (const auto & joint_tol : goal.path_tolerance)
