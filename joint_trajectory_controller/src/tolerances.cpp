@@ -121,11 +121,11 @@ SegmentTolerances get_segment_tolerances(
     auto it = joint_to_id.find(joint_tol.name);
     if (it == joint_to_id.end())
     {
-      RCLCPP_ERROR(
+      RCLCPP_WARN(
         logger,
         "Path tolerance specified for unknown joint '%s'. Using default tolerances.",
         joint_tol.name.c_str());
-      return default_tolerances;
+      continue;
     }
     size_t i = it->second;
     std::string interface = "";
@@ -163,11 +163,11 @@ SegmentTolerances get_segment_tolerances(
     auto it = joint_to_id.find(joint_tol.name);
     if (it == joint_to_id.end())
     {
-      RCLCPP_ERROR(
+      RCLCPP_WARN(
         logger,
         "Goal tolerance specified for unknown joint '%s'. Using default tolerances.",
         joint_tol.name.c_str());
-      return default_tolerances;
+      continue;
     }
     size_t i = it->second;
     std::string interface = "";
