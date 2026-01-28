@@ -59,7 +59,7 @@ double resolve_tolerance_source(const double default_value, const double goal_va
   }
   else if (goal_value < 0.0)
   {
-    throw std::runtime_error("Illegal tolerance value");
+    throw std::runtime_error("Illegal tolerance value.");
   }
   
   // goal_value is 0.0, use default
