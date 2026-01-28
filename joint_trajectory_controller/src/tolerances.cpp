@@ -44,16 +44,15 @@ namespace joint_trajectory_controller
 
 double resolve_tolerance_source(const double default_value, const double goal_value)
 {
-  // Erase value is -1.0
-  const double ERASE_VALUE = -1.0;
-  // Epsilon for comparision
-  const double EPSILON = std::numeric_limits<float>::epsilon();
+  constexpr double ERASE_VALUE = -1.0;
+  auto is_erase_value = [=](double value)
+  { return fabs(value - ERASE_VALUE) < std::numeric_limits<float>::epsilon(); };
 
   if (goal_value > 0.0)
   {
     return goal_value;
   }
-  else if (std::abs(goal_value - ERASE_VALUE) < EPSILON)
+  else if (is_erase_value(goal_value))
   {
     return 0.0;
   }
@@ -61,8 +60,6 @@ double resolve_tolerance_source(const double default_value, const double goal_va
   {
     throw std::runtime_error("Illegal tolerance value.");
   }
-  
-  // goal_value is 0.0, use default
   return default_value;
 }
 
