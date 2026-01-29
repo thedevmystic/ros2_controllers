@@ -41,25 +41,30 @@
 
 namespace joint_trajectory_controller
 {
-
 double resolve_tolerance_source(const double default_value, const double goal_value)
 {
   constexpr double ERASE_VALUE = -1.0;
-  auto is_erase_value = [=](double value)
-  { return fabs(value - ERASE_VALUE) < std::numeric_limits<float>::epsilon(); };
+  constexpr double EPSILON = std::numeric_limits<double>::epsilon();
+
+  // Helper lambda to check for values
+  auto is_erase_value = [&](double value) { return std::fabs(value - ERASE_VALUE) < EPSILON; };
 
   if (goal_value > 0.0)
   {
+    // Valid +ve tolerance, return by value
     return goal_value;
   }
   else if (is_erase_value(goal_value))
   {
+    // Valid -ve tolerance (-1), erase value to 0
     return 0.0;
   }
   else if (goal_value < 0.0)
   {
+    // All other -ve tolerances are invalid.
     throw std::runtime_error("Illegal tolerance value.");
   }
+  // Return default value if passes every check
   return default_value;
 }
 
@@ -105,22 +110,6 @@ SegmentTolerances get_segment_tolerances(
   static auto logger = jtc_logger.get_child("tolerance");
   SegmentTolerances active_tolerances(default_tolerances);
 
-  // Process goal_time_tolerance
-  try
-  {
-    double goal_time_sec = rclcpp::Duration(goal.goal_time_tolerance).seconds();
-    active_tolerances.goal_time_tolerance = resolve_tolerance_source(
-      default_tolerances.goal_time_tolerance, goal_time_sec);
-  }
-  catch (const std::runtime_error & e)
-  {
-    RCLCPP_ERROR(
-      logger, "Illegal goal time tolerance specified: %f. Using default tolerances.",
-      rclcpp::Duration(goal.goal_time_tolerance).seconds());
-    return default_tolerances;
-  }
-
-  
   // Create a map to look up joint by name for fast access
   std::map<std::string, size_t> joint_to_id;
   for (size_t i = 0; i < joints.size(); ++i)
@@ -128,6 +117,20 @@ SegmentTolerances get_segment_tolerances(
     joint_to_id[joints[i]] = i;
   }
 
+  // Process goal_time_tolerance
+  try
+  {
+    double goal_time_sec = rclcpp::Duration(goal.goal_time_tolerance).seconds();
+    active_tolerances.goal_time_tolerance =
+      resolve_tolerance_source(default_tolerances.goal_time_tolerance, goal_time_sec);
+  }
+  catch (const std::runtime_error & e)
+  {
+    RCLCPP_WARN(
+      logger, "Illegal goal time tolerance specified: %f. Using default tolerances.",
+      rclcpp::Duration(goal.goal_time_tolerance).seconds());
+    return default_tolerances;
+  }
 
   // Process goal.path_tolerance (Execution Constraints)
   for (const auto & joint_tol : goal.path_tolerance)
@@ -136,8 +139,7 @@ SegmentTolerances get_segment_tolerances(
     if (it == joint_to_id.end())
     {
       RCLCPP_WARN(
-        logger,
-        "Path tolerance specified for unknown joint '%s'. Using default tolerances.",
+        logger, "Path tolerance specified for unknown joint '%s'. Using default tolerances.",
         joint_tol.name.c_str());
       continue;
     }
@@ -163,7 +165,7 @@ SegmentTolerances get_segment_tolerances(
     }
     catch (const std::runtime_error & e)
     {
-      RCLCPP_ERROR(
+      RCLCPP_WARN(
         logger,
         "Illegal %s path tolerance value specified for joint '%s'. Using default tolerances.",
         interface.c_str(), joint_tol.name.c_str());
@@ -178,8 +180,7 @@ SegmentTolerances get_segment_tolerances(
     if (it == joint_to_id.end())
     {
       RCLCPP_WARN(
-        logger,
-        "Goal tolerance specified for unknown joint '%s'. Using default tolerances.",
+        logger, "Goal tolerance specified for unknown joint '%s'. Using default tolerances.",
         joint_tol.name.c_str());
       continue;
     }
@@ -205,7 +206,7 @@ SegmentTolerances get_segment_tolerances(
     }
     catch (const std::runtime_error & e)
     {
-      RCLCPP_ERROR(
+      RCLCPP_WARN(
         logger,
         "Illegal %s goal tolerance value specified for joint '%s'. Using default tolerances.",
         interface.c_str(), joint_tol.name.c_str());
@@ -222,19 +223,15 @@ SegmentTolerances get_segment_tolerances(
     RCLCPP_DEBUG(logger, "Trajectory Position: %f", active_tolerances.state_tolerance[i].position);
     RCLCPP_DEBUG(logger, "Trajectory Velocity: %f", active_tolerances.state_tolerance[i].velocity);
     RCLCPP_DEBUG(
-      logger, "Trajectory Acceleration: %f",
-      active_tolerances.state_tolerance[i].acceleration);
+      logger, "Trajectory Acceleration: %f", active_tolerances.state_tolerance[i].acceleration);
+    RCLCPP_DEBUG(logger, "Goal Position: %f", active_tolerances.goal_state_tolerance[i].position);
+    RCLCPP_DEBUG(logger, "Goal Velocity: %f", active_tolerances.goal_state_tolerance[i].velocity);
     RCLCPP_DEBUG(
-      logger, "Goal Position: %f", active_tolerances.goal_state_tolerance[i].position);
-    RCLCPP_DEBUG(
-      logger, "Goal Velocity: %f", active_tolerances.goal_state_tolerance[i].velocity);
-    RCLCPP_DEBUG(
-      logger, "Goal Acceleration: %f",
-      active_tolerances.goal_state_tolerance[i].acceleration);
+      logger, "Goal Acceleration: %f", active_tolerances.goal_state_tolerance[i].acceleration);
   }
   RCLCPP_DEBUG(logger, "---------------------------");
 
   return active_tolerances;
 }
 
-} // namespace joint_trajectory_controller
+}  // namespace joint_trajectory_controller
