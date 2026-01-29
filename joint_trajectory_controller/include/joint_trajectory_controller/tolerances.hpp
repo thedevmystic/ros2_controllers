@@ -162,8 +162,8 @@ double resolve_tolerance_source(const double default_value, const double goal_va
  * \param[in] jtc_logger The logger to use for output and debugging messages.
  * \param[in] default_tolerances The base tolerances configured via ROS parameters, used if
  *                               the action goal does not specify any, or if the goal is invalid.
- * \param[in] goal The new `FollowJointTrajectory` action goal containing optional tolerance overrides
- *                 in `path_tolerance` and `goal_tolerance` fields.
+ * \param[in] goal The new `FollowJointTrajectory` action goal containing optional tolerance
+ * overrides in `path_tolerance` and `goal_tolerance` fields.
  * \param[in] joints The list of joints configured for the controller (used for index mapping).
  * \return The resolved `SegmentTolerances` object, prioritizing goal values over defaults.
  */
@@ -182,8 +182,7 @@ SegmentTolerances get_segment_tolerances(
  */
 trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
   const trajectory_msgs::msg::JointTrajectoryPoint & desired_state,
-  const trajectory_msgs::msg::JointTrajectoryPoint & current_state,
-  bool show_errors = false);
+  const trajectory_msgs::msg::JointTrajectoryPoint & current_state, bool show_errors = false);
 
 /**
  * \brief Checks if the error for a single joint state component is within the defined tolerance.
@@ -200,7 +199,7 @@ trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
  * \param[in] show_errors If true, logging messages about the tolerance violation will be shown.
  *
  * **WARNING: Logging is not real-time safe.**
- * 
+ *
  * \return True if the absolute error for all checked components (where tolerance > 0.0)
  * is less than or equal to the respective tolerance; False otherwise.
  */
@@ -215,20 +214,19 @@ bool check_state_tolerance_per_joint(
  *
  * \param[in] state_error Error point (difference between commanded and actual) for all joints.
  * \param[in] segment_tolerances StateTolerances for all joints in the trajectory.
- * \param[in] show_errors If the joint that violates its tolerance should be output to console (NON-REALTIME if true).
+ * \param[in] show_errors If the joint that violates its tolerance should be output to console
+ * (NON-REALTIME if true).
  * \return True if ALL joints are within their defined tolerances, false otherwise.
  */
 bool check_trajectory_point_tolerance(
   const trajectory_msgs::msg::JointTrajectoryPoint & state_error,
-  const std::vector<StateTolerances> & segment_tolerances,
-  bool show_errors = false);
+  const std::vector<StateTolerances> & segment_tolerances, bool show_errors = false);
 
 /** Inline Functions Implementations **/
 
 inline trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
   const trajectory_msgs::msg::JointTrajectoryPoint & desired_state,
-  const trajectory_msgs::msg::JointTrajectoryPoint & current_state,
-  bool show_errors)
+  const trajectory_msgs::msg::JointTrajectoryPoint & current_state, bool show_errors)
 {
   trajectory_msgs::msg::JointTrajectoryPoint error_state;
   const size_t n_joints = desired_state.positions.size();
@@ -247,36 +245,33 @@ inline trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
         "Current state positions size (%zu) does not match desired state positions size (%zu).",
         current_state.positions.size(), n_joints);
     }
-    return error_state; // Return empty error state
+    return error_state;  // Return empty error state
   }
 
   // Position Error
   error_state.positions.resize(n_joints);
   std::transform(
-    desired_state.positions.begin(), desired_state.positions.end(),
-    current_state.positions.begin(), error_state.positions.begin(),
-    subtract);
+    desired_state.positions.begin(), desired_state.positions.end(), current_state.positions.begin(),
+    error_state.positions.begin(), subtract);
 
   // Velocity Error (Only if both are same size)
-  if (desired_state.velocities.size() == n_joints &&
-      current_state.velocities.size() == n_joints)
+  if (desired_state.velocities.size() == n_joints && current_state.velocities.size() == n_joints)
   {
     error_state.velocities.resize(n_joints);
     std::transform(
       desired_state.velocities.begin(), desired_state.velocities.end(),
-      current_state.velocities.begin(), error_state.velocities.begin(),
-      subtract);
+      current_state.velocities.begin(), error_state.velocities.begin(), subtract);
   }
 
   // Acceleration Error (Only if both are same size)
-  if (desired_state.accelerations.size() == n_joints &&
-      current_state.accelerations.size() == n_joints)
+  if (
+    desired_state.accelerations.size() == n_joints &&
+    current_state.accelerations.size() == n_joints)
   {
     error_state.accelerations.resize(n_joints);
     std::transform(
       desired_state.accelerations.begin(), desired_state.accelerations.end(),
-      current_state.accelerations.begin(), error_state.accelerations.begin(),
-      subtract);
+      current_state.accelerations.begin(), error_state.accelerations.begin(), subtract);
   }
 
   return error_state;
@@ -295,17 +290,16 @@ inline bool check_state_tolerance_per_joint(
     {
       const auto logger = rclcpp::get_logger("tolerances");
       RCLCPP_ERROR(
-        logger, "Joint index %zu is out of bounds for positions of size %zu.",
-        joint_idx, state_error.positions.size());
+        logger, "Joint index %zu is out of bounds for positions of size %zu.", joint_idx,
+        state_error.positions.size());
     }
-    return false; // Invalid joint index
+    return false;  // Invalid joint index
   }
 
   // Helper lambda to check if an index is valid for a vector
-  auto check_index = [joint_idx](const std::vector<double> & vec) {
-    return joint_idx < vec.size();
-  };
-    
+  auto check_index = [joint_idx](const std::vector<double> & vec)
+  { return joint_idx < vec.size(); };
+
   // Extract joint state components from state_error
   const double error_position = state_error.positions[joint_idx];
   const double error_velocity =
@@ -363,8 +357,7 @@ inline bool check_state_tolerance_per_joint(
 
 inline bool check_trajectory_point_tolerance(
   const trajectory_msgs::msg::JointTrajectoryPoint & state_error,
-  const std::vector<StateTolerances> & segment_tolerances,
-  bool show_errors)
+  const std::vector<StateTolerances> & segment_tolerances, bool show_errors)
 {
   // Check that the error vector size matches the tolerance vector size
   if (state_error.positions.size() != segment_tolerances.size())
@@ -373,11 +366,10 @@ inline bool check_trajectory_point_tolerance(
     {
       const auto logger = rclcpp::get_logger("tolerances");
       RCLCPP_ERROR(
-        logger, 
-        "Error point joint size (%zu) does not match tolerance joint size (%zu).",
+        logger, "Error point joint size (%zu) does not match tolerance joint size (%zu).",
         state_error.positions.size(), segment_tolerances.size());
     }
-    return false; // Cannot perform a valid check
+    return false;  // Cannot perform a valid check
   }
 
   for (size_t i = 0; i < segment_tolerances.size(); ++i)
@@ -386,11 +378,11 @@ inline bool check_trajectory_point_tolerance(
     // interfaces (position, velocity, and acceleration).
     if (!check_state_tolerance_per_joint(state_error, i, segment_tolerances[i], show_errors))
     {
-      return false; // Found a joint that failed its tolerance
+      return false;  // Found a joint that failed its tolerance
     }
   }
 
-  return true; // All joints passed the tolerance check
+  return true;  // All joints passed the tolerance check
 }
 
 }  // namespace joint_trajectory_controller
