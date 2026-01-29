@@ -64,7 +64,7 @@ double resolve_tolerance_source(const double default_value, const double goal_va
     // All other -ve tolerances are invalid.
     throw std::runtime_error("Illegal tolerance value.");
   }
-  // Return default value if passes every check
+  // Return default value if don't pass any check
   return default_value;
 }
 
@@ -141,10 +141,10 @@ SegmentTolerances get_segment_tolerances(
       RCLCPP_WARN(
         logger, "Path tolerance specified for unknown joint '%s'. Using default tolerances.",
         joint_tol.name.c_str());
-      continue;
+      return default_tolerances;
     }
     size_t i = it->second;
-    std::string interface = "";
+    std::string interface = ""; // For error tracking
 
     try
     {
@@ -182,10 +182,10 @@ SegmentTolerances get_segment_tolerances(
       RCLCPP_WARN(
         logger, "Goal tolerance specified for unknown joint '%s'. Using default tolerances.",
         joint_tol.name.c_str());
-      continue;
+      return default_tolerances;
     }
     size_t i = it->second;
-    std::string interface = "";
+    std::string interface = ""; // For error tracking
 
     try
     {
