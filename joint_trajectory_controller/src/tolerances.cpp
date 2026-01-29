@@ -144,7 +144,7 @@ SegmentTolerances get_segment_tolerances(
       return default_tolerances;
     }
     size_t i = it->second;
-    std::string interface = ""; // For error tracking
+    std::string interface = "";  // For error tracking
 
     try
     {
@@ -185,7 +185,7 @@ SegmentTolerances get_segment_tolerances(
       return default_tolerances;
     }
     size_t i = it->second;
-    std::string interface = ""; // For error tracking
+    std::string interface = "";  // For error tracking
 
     try
     {
