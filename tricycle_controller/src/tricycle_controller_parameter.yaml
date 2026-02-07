@@ -89,7 +89,7 @@ tricycle_controller:
     default_value: 2.0,
     description: "Exponent for the convex power function used to scale down traction speed based on steering error.",
     validation: {
-      lower_bound<>: [1.0]
+      gt_eq<>: [1.0]
     }
   }
   steering_min_speed_scale: {
@@ -97,7 +97,7 @@ tricycle_controller:
     default_value: 0.01,
     description: "Minimum allowed value of the speed scale.",
     validation: {
-      lower_bound<>: [0]
+      gt_eq<>: [0.0]
     }
   }
   traction:
