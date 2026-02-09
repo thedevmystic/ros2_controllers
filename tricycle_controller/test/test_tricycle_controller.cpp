@@ -391,12 +391,12 @@ TEST_F(TestTricycleController, convex_speed_scaling)
   const double exponent = 2.0;
   const double min_scale = 0.01;
 
+  position_ = 0.0; 
+  assignResources();
+  controller_->on_activate(rclcpp_lifecycle::State());
+
   for (const double degrees : test_degrees)
   {
-    position_ = 0.0;
-    assignResources();
-    controller_->on_activate(rclcpp_lifecycle::State());
-
     // For Vx = 0, alpha = sign(theta_dot) * PI/2.
     // To get specific angles, we use Vx = 1.0 and calculate required theta_dot
     double rad = degrees * M_PI / 180.0;
