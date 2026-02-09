@@ -415,7 +415,7 @@ TEST_F(TestTricycleController, convex_speed_scaling)
     double alpha_delta = std::abs(alpha_write - alpha_read);
 
     double expected_scale = 1.0;
-    if (alpha_delta >= M_PI / 6.0)  // 30 degrees threshold
+    if (alpha_delta > M_PI / 6.0)  // 30 degrees threshold
     {
       double normalized_error = std::min(alpha_delta / M_PI_2, 1.0);
       expected_scale = std::pow(1.0 - normalized_error, exponent);
