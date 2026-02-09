@@ -397,6 +397,9 @@ TEST_F(TestTricycleController, convex_speed_scaling)
 
   for (const double degrees : test_degrees)
   {
+    // Reset steering position to 0 for each test iteration
+    position_ = 0.0;
+
     // For Vx = 0, alpha = sign(theta_dot) * PI/2.
     // To get specific angles, we use Vx = 1.0 and calculate required theta_dot
     double rad = degrees * M_PI / 180.0;
@@ -426,11 +429,11 @@ TEST_F(TestTricycleController, convex_speed_scaling)
     double unscaled_ws = vx / (1.0 * std::cos(rad));
     double expected_ws = unscaled_ws * expected_scale;
 
-    // 5. Verification
+    // Verification
     EXPECT_NEAR(traction_joint_vel_cmd_->get_optional().value(), expected_ws, 1e-3)
       << "Failed reduction test at " << degrees << " degrees.";
-
-    controller_->on_deactivate(rclcpp_lifecycle::State());
   }
+  
+  controller_->on_deactivate(rclcpp_lifecycle::State());
   executor.cancel();
 }
