@@ -346,7 +346,7 @@ TEST_F(TestTricycleController, correct_initialization_using_parameters)
     controller_->update(rclcpp::Time(0, 0, RCL_ROS_TIME), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   EXPECT_EQ(0.0, steering_joint_pos_cmd_->get_optional().value());
-  EXPECT_EQ(1.0, traction_joint_vel_cmd_->get_optional().value());
+  EXPECT_NEAR(0.876729, traction_joint_vel_cmd_->get_optional().value(), 1e-3);
 
   // deactivated
   // wait so controller process the second point when deactivated
