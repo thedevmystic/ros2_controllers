@@ -272,7 +272,7 @@ inline trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
       // Use shortest distance for wraparound joints (e.g., continuous joints)
       // Normalized between: [-pi, pi]
       error_state.positions[i] =
-        angles::shortest_distance(current_state.positions[i], desired_state.positions[i]);
+        angles::shortest_angular_distance(current_state.positions[i], desired_state.positions[i]);
     }
     else
     {
