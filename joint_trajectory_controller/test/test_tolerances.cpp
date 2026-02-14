@@ -52,6 +52,7 @@ protected:
   SegmentTolerances default_tolerances;
   joint_trajectory_controller::Params params;
   std::vector<std::string> joint_names_;
+  std::vector<bool> is_wraparounds_;
   rclcpp::Logger logger = rclcpp::get_logger("TestTolerancesFixture");
 
   void SetUp() override
