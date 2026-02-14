@@ -186,7 +186,7 @@ SegmentTolerances get_segment_tolerances(
 trajectory_msgs::msg::JointTrajectoryPoint create_error_trajectory_point(
   const trajectory_msgs::msg::JointTrajectoryPoint & desired_state,
   const trajectory_msgs::msg::JointTrajectoryPoint & current_state,
-  std::vector<bool> & is_wraparounds, bool show_errors = false);
+  const std::vector<bool> & is_wraparounds, bool show_errors = false);
 
 /**
  * \brief Checks if the error for a single joint state component is within the defined tolerance.
