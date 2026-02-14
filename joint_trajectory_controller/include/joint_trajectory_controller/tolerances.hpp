@@ -179,7 +179,7 @@ SegmentTolerances get_segment_tolerances(
  *
  * \param[in] desired_state The commanded state point.
  * \param[in] current_state The actual state point from the hardware.
- * \param[in] is_wraparounds A vector indicating which joints are wraparound (e.g., continuous joints).
+ * \param[in] is_wraparounds A vector indicating which joints are wraparound (e.g., continuous).
  * \param[in] show_errors If true, logging messages about size mismatches will be shown.
  * \return A JointTrajectoryPoint where positions, velocities, etc., are the difference.
  */
