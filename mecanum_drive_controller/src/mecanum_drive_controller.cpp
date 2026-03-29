@@ -295,10 +295,6 @@ void MecanumDriveController::reference_callback(const std::shared_ptr<Controller
       "Received message has timestamp %.10f older by %.10f than allowed timeout (%.4f).",
       rclcpp::Time(msg->header.stamp).seconds(), age_of_last_command.seconds(),
       ref_timeout_.seconds());
-
-    ControllerReferenceMsg emtpy_msg;
-    reset_controller_reference_msg(emtpy_msg, get_node());
-    input_ref_.set(emtpy_msg);
   }
 }
 
@@ -434,8 +430,6 @@ controller_interface::return_type MecanumDriveController::update_reference_from_
       current_ref_.twist.linear.x = std::numeric_limits<double>::quiet_NaN();
       current_ref_.twist.linear.y = std::numeric_limits<double>::quiet_NaN();
       current_ref_.twist.angular.z = std::numeric_limits<double>::quiet_NaN();
-
-      input_ref_.try_set(current_ref_);
     }
   }
 
